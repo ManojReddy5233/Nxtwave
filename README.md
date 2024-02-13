@@ -42,20 +42,6 @@ they are:
          }'
 
 
-        curl --location 'http://127.0.0.1:8000/user/addTransportRequest' \
-        --header 'Content-Type: application/json' \
-        --data '{
-          "from_location": "mum",
-          "to_location": "blr",
-          "date": "2024-02-13",
-          "receiver_mobilenumber": "9502379475",
-          "quantity": 5,
-          "asset_type": "LAPTOP",
-          "sensitivity": "NORMAL",
-          "requester_id": 5
-        }'
-
-
 
 
 
