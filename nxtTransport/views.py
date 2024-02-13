@@ -561,6 +561,46 @@ def validate_date(data):
     # If all checks pass, return True
     return True
 
+def getMatchingRides(request):
+    if request.method == 'GET':
+        validatePageNo= validate_pageno(request.GET)
+        if(validatePageNo!=True): return JsonResponse({'error': validatePageNo}, status=400)
+        validatePageSize= validate_pageSize(request.GET)
+        if(validatePageSize!=True): return JsonResponse({'error': validatePageSize}, status=400)
+        pageno = int(request.GET.get('pageno'))
+        pageSize = int(request.GET.get('pageSize'))
+        request_id = request.GET.get('request_id')
+        if request_id is None:
+            return JsonResponse({'error': 'request_id is required'}, status=400)
+        try:
+            request_id = int(request_id)
+            if(TransportRequest.objects.filter(id=request_id).exists()==True):
+                transportRequest = TransportRequest.objects.get(id=request.GET.get('request_id'))
+                rides = Ride.objects.filter(from_location=transportRequest.from_location,
+                                            to_location=transportRequest.to_location,
+                                            date=transportRequest.date,
+                                            quantity__gte=transportRequest.quantity
+                )[pageno*pageSize: (pageno+1)*pageSize]
+                serialized_rides = []
+                for ride in rides:
+                    serialized_rides.append({
+                        'rider_id': ride.rider_id.id,
+                        'from_location': ride.from_location,
+                        'to_location': ride.to_location,
+                        'date': ride.date,
+                        'quantity': ride.quantity,
+                        'medium': ride.medium
+                    })
+                return JsonResponse({'data': serialized_rides}, status=200)
+            else:
+                return  JsonResponse({'error': 'request_id does not exist'}, status=400)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+
+    else:
+        return JsonResponse({'error': 'Method Not Allowed'}, status=400)
+
+
 
 
 

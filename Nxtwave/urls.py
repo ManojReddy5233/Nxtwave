@@ -34,6 +34,7 @@ path('404/', views.handle_not_found),
     path('user/addTransportRequest', transport_views.addTransportRequest),
     path('user/addRide', transport_views.addRide),
     path('user/getTransportRequests', transport_views.getTransportRequests),
+     path('user/getMatchingRides', transport_views.getMatchingRides),
 
 # path('home/saveUserDetails', views.save_user_details)
 ]
