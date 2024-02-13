@@ -1,5 +1,7 @@
 i have incorporated a total of 6 APIS IN this codebase
 they are:
+
+
          curl --location 'http://127.0.0.1:8000/user/create' \
         --header 'Content-Type: application/json' \
         --data-raw '{
