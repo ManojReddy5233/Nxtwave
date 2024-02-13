@@ -6,7 +6,7 @@ from django.db import transaction
 
 from django.shortcuts import render
 from .models import User
-from .models import TransportRequest
+from .models import TransportRequest , ReqApplication
 from .models import Ride
 from datetime import datetime
 from datetime import date
@@ -600,9 +600,59 @@ def getMatchingRides(request):
     else:
         return JsonResponse({'error': 'Method Not Allowed'}, status=400)
 
+@csrf_exempt
+def applyForRide(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        validateRideIdRequestId = validate_ride_id_request_id(data)
+
+        if(validateRideIdRequestId!=True): return JsonResponse({'error': validateRideIdRequestId}, status=400)
+
+        try:
+            request_id = int(data.get('request_id'))
+
+            ride_id = int(data.get('ride_id'))
+            newApplication = ReqApplication(request_id=TransportRequest.objects.get(id=request_id),
+                             ride_id=Ride.objects.get(id=ride_id), datetime=datetime.now(),status='applied')
+            newApplication.save()
+            TransportRequest.objects.filter(id=request_id).update(status='applied')
+
+            return JsonResponse({'data': str(newApplication)}, status=201)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    else:
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
 
 
+def validate_ride_id_request_id(data):
+    request_id = data.get('request_id')
+    print(request_id)
+    if request_id is None: return 'request_id is required'
 
+    ride_id = data.get('ride_id')
+    print(ride_id)
+    if ride_id is None: return 'ride_id is required'
+
+    try:
+
+        request_id = int(request_id)
+        ride_id = int(ride_id)
+
+        if ride_id not in matchingRidesOfRequest(request_id): return 'ride is not a match to the request'
+    except Exception as e:
+        return str(e)
+    return True
+
+
+def matchingRidesOfRequest(request_id):
+    transportRequest = TransportRequest.objects.get(id=request_id)
+    matching_rides_ids = Ride.objects.filter(
+        from_location=transportRequest.from_location,
+        to_location=transportRequest.to_location,
+        date=transportRequest.date,
+        quantity__gte=transportRequest.quantity
+    ).values_list('id', flat=True)
+    return list(matching_rides_ids)
 
 
 

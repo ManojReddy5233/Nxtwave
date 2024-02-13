@@ -33,3 +33,12 @@ class Ride(models.Model):
 
     def __str__(self):
         return f"Ride  from {self.from_location} to {self.to_location} on {self.date} by rider_id: {self.rider_id}"
+
+class ReqApplication(models.Model):
+    request_id = models.ForeignKey(TransportRequest, on_delete=models.CASCADE, to_field='id')
+    ride_id = models.ForeignKey(Ride, on_delete=models.CASCADE, to_field='id')
+    status = models.CharField(max_length=10)
+    datetime = models.DateTimeField()
+
+    def __str__(self):
+        return f"request  from {self.request_id.id} to {self.ride_id.id} on {self.datetime} by status: {self.status}"
