@@ -61,3 +61,4 @@ they are:
           "request_id": 1,
           "ride_id": 16
         }'
+google_drive_link_of_screenshots: https://drive.google.com/drive/folders/1RgX0IZ9aeF7rcxTUNyjl8p6avxrkkJEq?usp=sharing
